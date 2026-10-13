@@ -1,0 +1,33 @@
+Summary of list_workspace_files (main.py, line 22)
+
+Purpose
+-------
+list_workspace_files is an MCP tool (registered with @mcp.tool()) that lists the files and folders inside the workspace, or inside a subdirectory of it.
+
+Input
+-----
+relative_path (str, optional): a path relative to the workspace root. Defaults to "." (the root itself).
+
+How it works
+------------
+1. It joins relative_path onto WORKSPACE_ROOT and resolves it to an absolute path.
+2. It calls is_safe_path() to make sure the resolved path stays inside the workspace root. This blocks attempts to escape the workspace, such as "../../etc". If the path is outside the workspace or does not exist, it returns "Error: Access denied or path does not exist."
+3. It reads the directory with os.listdir() and skips hidden entries (names starting with "."), such as .git.
+4. For each remaining entry, it labels it [DIR] or [FILE].
+5. It returns one string with a header line ("Contents of <relative_path>:") followed by one indented line per entry.
+
+Example output
+--------------
+Contents of .:
+  [FILE] main.py
+  [FILE] notes.md
+  [DIR] src
+
+Error handling
+--------------
+Any unexpected exception (for example, a permissions problem) is caught and returned as "Error listing directory: <details>".
+
+Notes
+-----
+- It is not recursive. It lists only the immediate contents of one directory.
+- Entries are shown in whatever order os.listdir() returns them (not sorted).
